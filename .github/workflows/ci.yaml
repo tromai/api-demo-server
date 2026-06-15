@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pack:
+    name: Pack charm
+    runs-on: ubuntu-24.04
+    outputs:
+      charm-path: ${{ steps.pack.outputs.charm-path }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install charmcraft
+        run: sudo snap install charmcraft --classic
+
+      - name: Pack charm
+        id: pack
+        run: |
+          charmcraft pack --verbose
+          echo "charm-path=$(ls *.charm | head -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload charm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: charm
+          path: "*.charm"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run lint
+        run: uvx --with tox-uv tox -e lint
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run unit tests
+        run: uvx --with tox-uv tox -e unit
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-24.04
+    needs: pack
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download charm artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: charm
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up environment with concierge
+        run: |
+          sudo snap install --classic concierge
+          sudo concierge prepare --preset microk8s
+
+      - name: Run integration tests
+        env:
+          CHARM_PATH: ${{ needs.pack.outputs.charm-path }}
+        run: uvx --with tox-uv tox -e integration
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-logs
+          path: .logs/verbose.log
+          include-hidden-files: true
+          if-no-files-found: ignore
