@@ -80,7 +80,7 @@ jobs:
       - name: Run integration tests
         env:
           CHARM_PATH: ${{ needs.pack.outputs.charm-path }}
-        run: uvx --with tox-uv tox -e integration
+        run: uvx --with tox-uv tox -e integration -- --juju-dump-logs ./.logs
 
       - name: Upload test logs
         uses: actions/upload-artifact@v4
