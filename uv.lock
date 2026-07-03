@@ -314,7 +314,7 @@ wheels = [
 [[package]]
 name = "pytest-jubilant"
 version = "0.1"
-source = { git = "https://github.com/tromai/pytest-jubilant?rev=dump-log-to-logger#ab36a18929337cf79dae1d9f77173a052fca916c" }
+source = { git = "https://github.com/tromai/pytest-jubilant?rev=dump-log-to-logger#52bad1af395c0a95a4ce32bea91e93e7087fd2a2" }
 dependencies = [
     { name = "jubilant" },
     { name = "pytest" },
