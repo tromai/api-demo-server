@@ -69,12 +69,15 @@ class FastAPIDemoCharm(ops.CharmBase):
         framework.observe(self.database.on.endpoints_changed, self._on_database_endpoint)
 
     def _on_demo_server_pebble_ready(self, _: ops.PebbleReadyEvent) -> None:
+        logger.info('On demo server pebble ready')
         self._replan_workload()
 
     def _on_config_changed(self, _: ops.ConfigChangedEvent) -> None:
+        logger.info('On config changed')
         self._replan_workload()
 
     def _on_collect_status(self, event: ops.CollectStatusEvent) -> None:
+        logger.info('On collect status')
         try:
             self.load_config(FastAPIConfig)
         except ValueError as e:
@@ -99,6 +102,7 @@ class FastAPIDemoCharm(ops.CharmBase):
         self, _: DatabaseCreatedEvent | DatabaseEndpointsChangedEvent
     ) -> None:
         """Event is fired when the database is created or its endpoint is changed."""
+        logger.info('On database endpoint')
         self._replan_workload()
 
     def _replan_workload(self) -> None:
