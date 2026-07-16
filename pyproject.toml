@@ -42,9 +42,9 @@ unit = [
 ]
 # Dependencies of integration tests
 integration = [
-    "jubilant @ git+https://github.com/tromai/jubilant@improve-jubilant-log",
+    "jubilant @ git+https://github.com/tromai/jubilant",
     "pytest",
-    "pytest-jubilant @ git+https://github.com/tromai/pytest-jubilant@dump-log-to-logger",
+    "pytest-jubilant @ git+https://github.com/tromai/pytest-jubilant",
     "PyYAML",
 ]
 
@@ -57,10 +57,6 @@ show_missing = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-
-log_level = "INFO"
-
-log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(levelname)s %(name)s %(message)s"
 
