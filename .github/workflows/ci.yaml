@@ -80,10 +80,7 @@ jobs:
       - name: Run integration tests
         env:
           CHARM_PATH: ${{ needs.pack.outputs.charm-path }}
-        run: >
-          uvx --with tox-uv tox -e integration --
-            --log-file logs/verbose.log
-            --juju-dump-logs logs
+        run: uvx --with tox-uv tox -e integration -- --log-file logs/verbose.log --juju-dump-logs logs
 
       - name: Upload test logs
         if: ${{ !cancelled() }}
