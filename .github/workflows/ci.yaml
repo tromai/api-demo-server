@@ -21,7 +21,7 @@ jobs:
       - name: Pack charm
         id: pack
         run: |
-          charmcraft pack --verbose
+          sudo charmcraft pack --verbose --destructive-mode
           echo "charm-path=$(ls *.charm | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload charm artifact
@@ -80,13 +80,11 @@ jobs:
       - name: Run integration tests
         env:
           CHARM_PATH: ${{ needs.pack.outputs.charm-path }}
-        run: uvx --with tox-uv tox -e integration
+        run: uvx --with tox-uv tox -e integration -- --log-file logs/verbose.log --juju-dump-logs logs
 
       - name: Upload test logs
-        if: always()
-        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
         with:
-          name: integration-logs
-          path: .logs/verbose.log
-          include-hidden-files: true
-          if-no-files-found: ignore
+          name: integration-test-logs
+          path: logs
